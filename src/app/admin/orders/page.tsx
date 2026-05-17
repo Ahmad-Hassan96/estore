@@ -10,7 +10,7 @@ interface OrdersPageProps {
 }
 
 async function getOrders(status?: string): Promise<Order[]> {
-  const supabase = createClient()
+  const supabase = await createClient()
   let query = supabase.from('orders').select('*').order('created_at', { ascending: false })
   if (status) query = query.eq('status', status)
   const { data } = await query.limit(100)

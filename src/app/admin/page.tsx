@@ -4,7 +4,7 @@ import { formatPrice, getOrderStatusColor, getOrderStatusLabel } from '@/lib/uti
 import type { Order } from '@/lib/types'
 
 async function getStats() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const [ordersRes, productsRes, pendingRes, revenueRes] = await Promise.all([
     supabase.from('orders').select('id', { count: 'exact', head: true }),
@@ -24,7 +24,7 @@ async function getStats() {
 }
 
 async function getRecentOrders(): Promise<Order[]> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('orders')
     .select('*')
@@ -34,7 +34,7 @@ async function getRecentOrders(): Promise<Order[]> {
 }
 
 async function getLowStockProducts() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('products')
     .select('id, name, stock, category')

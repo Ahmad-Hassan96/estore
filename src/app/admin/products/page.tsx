@@ -6,7 +6,7 @@ import type { Product } from '@/lib/types'
 import { Plus } from 'lucide-react'
 
 async function getProducts(): Promise<Product[]> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('products')
     .select('*')

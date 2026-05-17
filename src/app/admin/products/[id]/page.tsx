@@ -7,7 +7,7 @@ interface EditProductPageProps {
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: product } = await supabase
     .from('products')
     .select('*')

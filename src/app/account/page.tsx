@@ -8,7 +8,7 @@ import { formatPrice, getOrderStatusColor, getOrderStatusLabel } from '@/lib/uti
 import type { Order } from '@/lib/types'
 
 async function getOrders(userId: string): Promise<Order[]> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('orders')
     .select('*')
@@ -18,7 +18,7 @@ async function getOrders(userId: string): Promise<Order[]> {
 }
 
 export default async function AccountPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')

@@ -5,7 +5,7 @@ import type { Product } from '@/lib/types'
 import { CATEGORIES } from '@/lib/utils'
 
 async function getFeaturedProducts(): Promise<Product[]> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('products')
     .select('*')
@@ -17,7 +17,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 async function getNewArrivals(): Promise<Product[]> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('products')
     .select('*')

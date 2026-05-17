@@ -18,7 +18,7 @@ interface ShopPageProps {
 const PER_PAGE = 12
 
 async function getProducts(searchParams: ShopPageProps['searchParams']): Promise<{ products: Product[]; count: number }> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const page = parseInt(searchParams.page || '1')
   const from = (page - 1) * PER_PAGE
   const to = from + PER_PAGE - 1
