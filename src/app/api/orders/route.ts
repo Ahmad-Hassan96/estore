@@ -1,9 +1,17 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+
+// Service role client — bypasses RLS, server-side only
+function createAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
     const body = await request.json()
     const { customerInfo, items, subtotal, shippingFee } = body
 
@@ -18,11 +26,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Address and city are required' }, { status: 400 })
     }
 
-    // Get current user (optional — supports guest checkout)
-    const { data: { user } } = await supabase.auth.getUser()
+    // Try to get current user (optional — supports guest checkout)
+    let userId: string | null = null
+    try {
+      const serverClient = await createServerClient()
+      const { data: { user } } = await serverClient.auth.getUser()
+      userId = user?.id || null
+    } catch {
+      // Guest checkout — no user session, that's fine
+    }
+
+    // Use admin client to bypass RLS for order insert
+    const adminClient = createAdminClient()
 
     const orderData = {
-      user_id: user?.id || null,
+      user_id: userId,
       customer_name: customerInfo.customer_name.trim(),
       customer_phone: customerInfo.customer_phone.trim(),
       customer_email: customerInfo.customer_email?.trim() || null,
@@ -38,7 +56,7 @@ export async function POST(request: Request) {
       payment_method: 'cod',
     }
 
-    const { data: order, error } = await supabase
+    const { data: order, error } = await adminClient
       .from('orders')
       .insert(orderData)
       .select('order_number, id')
